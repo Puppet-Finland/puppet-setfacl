@@ -6,7 +6,7 @@
 class setfacl::install inherits setfacl::params {
 
     package { 'setfacl-acl':
-        name => $::setfacl::params::package_name,
         ensure => installed,
+        name   => $::setfacl::params::package_name,
     }
 }

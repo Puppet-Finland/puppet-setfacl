@@ -22,7 +22,7 @@ class setfacl
     $targets = {}
 )
 {
-    include setfacl::install
+    include ::setfacl::install
 
     create_resources('setfacl::target', $targets)
 

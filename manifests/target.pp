@@ -52,15 +52,15 @@
 define setfacl::target
 (
     $paths,
-    $recurse = 'no',
-    $acls
+    $acls,
+    $recurse = 'no'
 )
 {
-    include setfacl::params
+    include ::setfacl::params
 
     # Generate strings from the array parameters
-    $paths_str = join($paths, " ")
-    $acl_str = join($acls, ",")
+    $paths_str = join($paths, ' ')
+    $acl_str = join($acls, ',')
 
     if $recurse == 'yes' {
         $basecmd = 'setfacl -R'
@@ -70,6 +70,6 @@ define setfacl::target
 
     exec { "setfacl-${title}":
         command => "${basecmd} -P -n -m \'${acl_str}\' ${paths_str}",
-        path => ['/bin', '/usr/bin', '/sbin', '/usr/sbin', '/usr/local/bin', '/usr/local/sbin'],
+        path    => ['/bin', '/usr/bin', '/sbin', '/usr/sbin', '/usr/local/bin', '/usr/local/sbin'],
     }
 }
