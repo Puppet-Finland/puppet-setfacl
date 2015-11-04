@@ -40,7 +40,7 @@
 #   An array of filesystem paths to apply the ACLs to.
 # [*recurse*]
 #   Recursively set ACLs for all files/directories beneath $path. Valid values 
-#   'yes' and 'no' (default).
+#   are true and false (default).
 # [*acls*]
 #   An array of ACLs to set. Example
 #   
@@ -53,16 +53,20 @@ define setfacl::target
 (
     $paths,
     $acls,
-    $recurse = 'no'
+    $recurse = false
 )
 {
+    validate_array($paths)
+    validate_array($acls)
+    validate_bool($recurse)
+
     include ::setfacl::params
 
     # Generate strings from the array parameters
     $paths_str = join($paths, ' ')
     $acl_str = join($acls, ',')
 
-    if $recurse == 'yes' {
+    if $recurse {
         $basecmd = 'setfacl -R'
     } else {
         $basecmd = 'setfacl'
