@@ -20,19 +20,29 @@
 # will eventually "cp -a" something with wrong Extended ACLs under the module 
 # directory, even if default ACLs are set correctly.
 #
-# Changes to Extended ACLs of any file in a directory could be detected like 
-# this:
+# That said, changes to Extended ACLs of any file in a directory could be 
+# detected like this:
 #
 # $ getfacl --omit-header -R environments/|sha1sum
 #
-# Even in this case the hash from previous Puppet run would have to be stored 
-# somewhere and compared to the new one in order to detect any changes. Even 
-# this approach would produce useless Puppet runs if Extended ACLs not managed 
-# by the Puppet module had changed. This can happen if the acl class parameter 
-# $action is not set to 'exact'.
+# This hash can be stored in a file, which can then be compared against a new 
+# hash generated dynamically for use with grep. This allows the Exec to run only 
+# if the ACLs in the managed files/directories have changed. However, due to the 
+# limitations of Exec this would mean that changing the ACLs in Puppet would no 
+# longer have any effect - only actual (external) changes to the files would 
+# trigger an Exec refresh. So the ACLs would also have to be stored and then 
+# compared on every run against the ACLs given as parameters. If either the hash 
+# or ACLs had changed, the setfacl Exec would run. I went down this route and 
+# the code quickly became quite nasty.
 #
-# To keep things simple this module just runs "setfacl" unconditionally from 
-# within an Exec.
+# Converting the hashes into facts does not work, either, because we can't pass 
+# parameters (e.g. a directory name) to a fact. And we'd need parameters, 
+# because we need to manage arbitrary directories.
+#
+# So, to keep things simple this module just runs "setfacl" unconditionally from 
+# within an Exec. The downside is that every Puppet run produces some output, 
+# which can produce useless messages (e.g. emails), which have to be filtered 
+# out outside of this module.
 #
 # == Parameters
 #
